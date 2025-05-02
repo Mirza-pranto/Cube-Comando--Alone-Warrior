@@ -1,0 +1,120 @@
+.MODEL SMALL
+ 
+.STACK 100H
+
+.DATA
+; Product list array
+    products DB "mojo", 0, "cocacola", 0, "pepsi", 0, "fanta", 0, "mirinda", 0
+
+    ; Price list array
+    prices DW 25, 40, 35, 35, 40
+
+    ; Messages for output
+    msgProduct DB "Product: ", 0
+    msgPrice DB ", Price: ", 0
+    newline DB 0DH, 0AH, '$'
+.CODE  
+
+; Macro to print product and price by index
+PRINT_PRODUCT_AND_PRICE MACRO index
+    ; Load product by index
+    MOV SI, OFFSET products
+    XOR CX, CX
+
+    ; Find the correct product based on index
+FindProduct:
+    CMP CX, index            ; Check if current index matches
+    JE PrintProduct          ; If yes, jump to print
+    ADD SI, 1                ; Move to next character
+    CMP BYTE PTR [SI], 0     ; Check for null terminator
+    JE IncrementIndex        ; If null, increment index
+    JMP FindProduct          ; Continue searching
+
+IncrementIndex:
+    ADD SI, 1                ; Skip null terminator
+    INC CX                   ; Increment index count
+    JMP FindProduct          ; Continue searching
+
+PrintProduct:
+    MOV DX, OFFSET msgProduct
+    CALL PrintString         ; Print "Product: "
+    MOV DX, SI
+    CALL PrintString         ; Print product name
+
+    ; Load price by index
+    MOV SI, OFFSET prices
+    MOV CX, index
+    SHL CX, 1                ; Multiply index by 2 (word size)
+    ADD SI, CX               ; Move to correct price in array
+    MOV AX, [SI]             ; Load the price into AX
+
+    ; Print price
+    MOV DX, OFFSET msgPrice
+    CALL PrintString         ; Print ", Price: "
+    CALL PrintNumber         ; Print price value
+    MOV DX, OFFSET newline
+    CALL PrintString         ; Print newline
+ENDM
+
+; Helper procedure to print a null-terminated string
+PrintString PROC
+    MOV AH, 09H               ; DOS function 09H: Print string
+    INT 21H                   ; Call DOS interrupt
+    RET
+PrintString ENDP
+
+; Helper procedure to print a number
+PrintNumber PROC
+    ; Convert number in AX to string and print
+    PUSH AX
+    XOR CX, CX
+
+ConvertLoop:
+    XOR DX, DX                ; Clear DX
+    MOV BX, 10                ; Base 10
+    DIV BX                    ; Divide AX by 10
+    PUSH DX                   ; Push remainder (digit) onto stack
+    INC CX                    ; Increment digit count
+    CMP AX, 0
+    JNE ConvertLoop           ; Continue if AX != 0
+
+PrintDigits:
+    POP DX                    ; Get digit from stack
+    ADD DL, '0'               ; Convert to ASCII
+    MOV AH, 02H               ; DOS function 02H: Print character
+    INT 21H                   ; Call DOS interrupt
+    LOOP PrintDigits          ; Loop until all digits are printed
+
+    POP AX                    ; Restore AX
+    RET
+PrintNumber ENDP
+
+; Main program
+    PRINT_PRODUCT_AND_PRICE 0 ; Print "mojo" and its price
+    PRINT_PRODUCT_AND_PRICE 1 ; Print "cocacola" and its price
+    PRINT_PRODUCT_AND_PRICE 2 ; Print "pepsi" and its price
+    PRINT_PRODUCT_AND_PRICE 3 ; Print "fanta" and its price
+    PRINT_PRODUCT_AND_PRICE 4 ; Print "mirinda" and its price
+
+
+MAIN PROC
+
+;iniitialize DS
+
+MOV AX,@DATA
+MOV DS,AX
+ 
+; enter your code here
+
+PRINT_PRODUCT_AND_PRICE 3
+
+
+ 
+
+;exit to DOS
+               
+MOV AX,4C00H
+INT 21H
+
+MAIN ENDP
+    END MAIN
