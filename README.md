@@ -133,20 +133,6 @@ Ready to become the Alone Warrior? The geometric invasion awaits!
 
 text
 
-### **Additional Tips to Get More Stars:**
 
-1.  **Add Visuals:** This is crucial! The README mentions a `Gameplay` badge that looks like an image. **Replace this with an actual screenshot or GIF of your game.** Record a short screen capture (10-15 seconds) of the action, convert it to a GIF, and add it to the top of your README. Visuals are incredibly effective at grabbing attention.
-
-2.  **Create a Requirements File:** Add a `requirements.txt` file to your repo with:
-    ```txt
-    pygame==2.5.2
-    PyOpenGL==3.1.7
-    PyOpenGL-accelerate==3.1.7
-    ```
-    Then update the installation instructions to:
-    ```bash
-    pip install -r requirements.txt
-    ```
-    This makes it much easier for people to run your game.
 
 
